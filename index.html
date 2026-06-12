@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracker Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-soft: #eff6ff;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #dbe4f0;
+      --primary: #1e40af;
+      --primary-2: #3b82f6;
+      --amber: #f59e0b;
+      --green: #059669;
+      --red: #dc2626;
+      --shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Fira Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 20px;
+      border-right: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      margin-bottom: 28px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      color: #ffffff;
+      background: var(--primary);
+      box-shadow: 0 10px 22px rgba(30, 64, 175, 0.28);
+    }
+
+    .brand-title {
+      margin: 0;
+      color: #1e3a8a;
+      font-family: "Fira Code", ui-monospace, monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .brand-subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .nav-label,
+    .section-label {
+      margin: 0 0 8px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      color: var(--primary);
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      outline: none;
+    }
+
+    .nav-link.active {
+      color: var(--primary);
+      border-color: #bfdbfe;
+      background: #dbeafe;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      left: 20px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+
+    .sidebar-footer strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--primary);
+      font-family: "Fira Code", ui-monospace, monospace;
+      font-size: 13px;
+    }
+
+    .sidebar-footer span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    main {
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--primary);
+      font-family: "Fira Code", ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .icon-button,
+    .primary-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .icon-button {
+      width: 40px;
+    }
+
+    .primary-button {
+      gap: 8px;
+      padding: 0 14px;
+      border-color: #d97706;
+      background: var(--amber);
+      color: #111827;
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: var(--primary);
+      outline: none;
+    }
+
+    .primary-button:hover,
+    .primary-button:focus-visible {
+      background: #fbbf24;
+      box-shadow: 0 10px 26px rgba(245, 158, 11, 0.28);
+      outline: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 188px;
+      gap: 20px;
+      padding: 22px;
+      overflow: hidden;
+    }
+
+    .summary-copy p {
+      max-width: 680px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .health-ring {
+      align-self: center;
+      justify-self: end;
+      display: grid;
+      place-items: center;
+      width: 156px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, #ffffff 0 54%, transparent 55%),
+        conic-gradient(var(--primary) 0 78%, #dbeafe 78% 100%);
+    }
+
+    .health-ring strong {
+      display: block;
+      color: var(--primary);
+      font-family: "Fira Code", ui-monospace, monospace;
+      font-size: 30px;
+      text-align: center;
+    }
+
+    .health-ring span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-card {
+      padding: 18px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .status-row:last-child {
+      border-bottom: 0;
+    }
+
+    .status-row span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-row strong {
+      font-family: "Fira Code", ui-monospace, monospace;
+      font-size: 15px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .kpi {
+      padding: 16px;
+    }
+
+    .kpi-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-head span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .kpi-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .metric {
+      margin: 0;
+      font-family: "Fira Code", ui-monospace, monospace;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .delta.warn {
+      color: var(--red);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 16px 0;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      color: #1e3a8a;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .chart {
+      height: 278px;
+      padding: 0 16px 16px;
+    }
+
+    .bars {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(22px, 1fr));
+      align-items: end;
+      gap: 10px;
+      height: 220px;
+      padding-top: 18px;
+      border-bottom: 1px solid var(--line);
+      background-image: linear-gradient(to top, #e2e8f0 1px, transparent 1px);
+      background-size: 100% 44px;
+    }
+
+    .bar {
+      position: relative;
+      min-height: 24px;
+      border-radius: 7px 7px 0 0;
+      background: linear-gradient(180deg, var(--primary-2), var(--primary));
+      cursor: pointer;
+      transition: filter 180ms ease;
+    }
+
+    .bar::after {
+      content: attr(data-value);
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--primary);
+      font-family: "Fira Code", ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+
+    .bar:hover,
+    .bar:focus-visible {
+      filter: brightness(1.08);
+      outline: 2px solid #93c5fd;
+      outline-offset: 2px;
+    }
+
+    .bar:hover::after,
+    .bar:focus-visible::after {
+      opacity: 1;
+    }
+
+    .axis {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(22px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-family: "Fira Code", ui-monospace, monospace;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .page-list {
+      display: grid;
+      gap: 10px;
+      padding: 0 16px 16px;
+    }
+
+    .page-card {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) 24px;
+      align-items: center;
+      gap: 12px;
+      min-height: 68px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      cursor: pointer;
+      transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+    }
+
+    .page-card:hover,
+    .page-card:focus-visible {
+      border-color: #93c5fd;
+      background: #eff6ff;
+      color: var(--primary);
+      outline: none;
+    }
+
+    .page-card-icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      color: var(--primary);
+      background: var(--panel-soft);
+    }
+
+    .page-card strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+
+    .page-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .table-wrap {
+      grid-column: 1 / -1;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    tr {
+      transition: background 180ms ease;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+
+    @media (max-width: 1060px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .sidebar-footer {
+        position: static;
+        margin-top: 18px;
+      }
+
+      .nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      main,
+      .sidebar {
+        padding: 16px;
+      }
+
+      .topbar,
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .top-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .summary {
+        display: block;
+      }
+
+      .health-ring {
+        justify-self: start;
+        width: 132px;
+        margin-top: 20px;
+      }
+
+      .kpi-grid,
+      .nav {
+        grid-template-columns: 1fr;
+      }
+
+      .chart {
+        overflow-x: auto;
+      }
+
+      .bars,
+      .axis {
+        min-width: 520px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 680px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 3v18h18"></path>
+            <path d="m7 15 4-4 3 3 5-7"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="brand-title">Tracker</p>
+          <p class="brand-subtitle">Control center</p>
+        </div>
+      </div>
+
+      <p class="nav-label">Workspace</p>
+      <nav class="nav">
+        <a class="nav-link active" href="index.html" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+            <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+            <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+            <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+          </svg>
+          Dashboard
+        </a>
+        <a class="nav-link" href="analytics.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <path d="M3 3v18h18"></path>
+            <path d="M18 17V9"></path>
+            <path d="M13 17V5"></path>
+            <path d="M8 17v-3"></path>
+          </svg>
+          Analytics
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <strong>Entry point ready</strong>
+        <span>Add future pages to this navigation and the quick-launch panel to keep the app map obvious.</span>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">HOME / OVERVIEW</p>
+          <h1>Dashboard command center</h1>
+        </div>
+        <div class="top-actions" aria-label="Dashboard actions">
+          <button class="icon-button" type="button" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+          </button>
+          <button class="icon-button" type="button" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+            </svg>
+          </button>
+          <a class="primary-button" href="analytics.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path d="M3 3v18h18"></path>
+              <path d="m19 9-5 5-4-4-3 3"></path>
+            </svg>
+            Open analytics
+          </a>
+        </div>
+      </header>
+
+      <section class="hero-grid" aria-label="Dashboard summary">
+        <div class="panel summary">
+          <div class="summary-copy">
+            <p class="section-label">System snapshot</p>
+            <h2>Everything important is surfaced first.</h2>
+            <p>This home page gives the tracker a true start screen: top-level metrics, current operational state, recent activity, and fast routes into the deeper pages.</p>
+          </div>
+          <div class="health-ring" aria-label="Overall health 78 percent">
+            <div>
+              <strong>78%</strong>
+              <span>Health</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel status-card" aria-label="Current status">
+          <p class="section-label">Today</p>
+          <div class="status-row">
+            <span>Active signals</span>
+            <strong>124</strong>
+          </div>
+          <div class="status-row">
+            <span>Reviewed</span>
+            <strong>86%</strong>
+          </div>
+          <div class="status-row">
+            <span>Next sync</span>
+            <strong>14:30</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="kpi-grid" aria-label="Key metrics">
+        <article class="panel kpi">
+          <div class="kpi-head">
+            <span>Total tracked</span>
+            <span class="kpi-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M4 19h16"></path>
+                <path d="M4 15h16"></path>
+                <path d="M4 11h16"></path>
+                <path d="M4 7h16"></path>
+              </svg>
+            </span>
+          </div>
+          <p class="metric">2,481</p>
+          <span class="delta">+12.4%</span>
+        </article>
+
+        <article class="panel kpi">
+          <div class="kpi-head">
+            <span>Completion</span>
+            <span class="kpi-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M20 6 9 17l-5-5"></path>
+              </svg>
+            </span>
+          </div>
+          <p class="metric">91%</p>
+          <span class="delta">+4.8%</span>
+        </article>
+
+        <article class="panel kpi">
+          <div class="kpi-head">
+            <span>Open issues</span>
+            <span class="kpi-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 8v4"></path>
+                <path d="M12 16h.01"></path>
+              </svg>
+            </span>
+          </div>
+          <p class="metric">17</p>
+          <span class="delta warn">+3 new</span>
+        </article>
+
+        <article class="panel kpi">
+          <div class="kpi-head">
+            <span>Avg. response</span>
+            <span class="kpi-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+              </svg>
+            </span>
+          </div>
+          <p class="metric">1.8h</p>
+          <span class="delta">-18 min</span>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Weekly activity</h2>
+            <span class="badge">Live</span>
+          </div>
+          <div class="chart" aria-label="Weekly activity chart">
+            <div class="bars">
+              <div class="bar" tabindex="0" data-value="64" style="height: 64%;"></div>
+              <div class="bar" tabindex="0" data-value="81" style="height: 81%;"></div>
+              <div class="bar" tabindex="0" data-value="53" style="height: 53%;"></div>
+              <div class="bar" tabindex="0" data-value="92" style="height: 92%;"></div>
+              <div class="bar" tabindex="0" data-value="74" style="height: 74%;"></div>
+              <div class="bar" tabindex="0" data-value="88" style="height: 88%;"></div>
+              <div class="bar" tabindex="0" data-value="69" style="height: 69%;"></div>
+              <div class="bar" tabindex="0" data-value="96" style="height: 96%;"></div>
+            </div>
+            <div class="axis" aria-hidden="true">
+              <span>Mon</span>
+              <span>Tue</span>
+              <span>Wed</span>
+              <span>Thu</span>
+              <span>Fri</span>
+              <span>Sat</span>
+              <span>Sun</span>
+              <span>Now</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Pages</h2>
+            <span class="badge pending">1 linked</span>
+          </div>
+          <div class="page-list">
+            <a class="page-card" href="analytics.html">
+              <span class="page-card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18 17V9"></path>
+                  <path d="M13 17V5"></path>
+                  <path d="M8 17v-3"></path>
+                </svg>
+              </span>
+              <span>
+                <strong>Analytics</strong>
+                <span>Open the detailed trends and performance view.</span>
+              </span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        </article>
+
+        <article class="panel table-wrap">
+          <div class="panel-header">
+            <h2>Recent activity</h2>
+            <span class="badge">Updated</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Owner</th>
+                <th>Status</th>
+                <th>Change</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Weekly summary generated</td>
+                <td>Ops</td>
+                <td><span class="badge">Complete</span></td>
+                <td>+18 tracked</td>
+                <td>08:42</td>
+              </tr>
+              <tr>
+                <td>Analytics review queued</td>
+                <td>Data</td>
+                <td><span class="badge pending">Pending</span></td>
+                <td>3 checks</td>
+                <td>09:15</td>
+              </tr>
+              <tr>
+                <td>Thresholds recalibrated</td>
+                <td>System</td>
+                <td><span class="badge">Complete</span></td>
+                <td>-7 alerts</td>
+                <td>10:03</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
